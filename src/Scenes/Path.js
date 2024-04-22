@@ -58,6 +58,8 @@ class Path extends Phaser.Scene {
         // Call startFollow() on enemyShip to have it follow the curve
         my.sprite.enemyShip = this.add.follower(this.curve, 10, 10, "enemyShip");
         my.sprite.enemyShip.visible = false;
+
+        document.getElementById('description').innerHTML = '<h2>Path.js</h2><br>ESC: Clear points <br>O - output points <br>R - run mode';
     }
 
     // Draws an x mark at every point along the spline.
