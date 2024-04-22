@@ -45,7 +45,8 @@ class Path extends Phaser.Scene {
             this.drawLine();
         });
 
-        this.runMode = false;
+        // TODO:
+        //  - set the run mode flag to false (after implenting run mode)
 
         // Create enemyShip as a follower type of sprite
         // Call startFollow() on enemyShip to have it follow the curve
