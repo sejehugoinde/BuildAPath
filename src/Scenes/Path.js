@@ -25,10 +25,6 @@ class Path extends Phaser.Scene {
         ];
         this.curve = new Phaser.Curves.Spline(this.points);
 
-        // Create a path and then add the curve (spline) to the path
-        this.path = this.add.path(this.curve.points[0].x, this.curve.points[0].y);
-        this.path.add(this.curve);
-
         // Initialize Phaser graphics, used to draw lines
         this.graphics = this.add.graphics();
 
@@ -152,7 +148,6 @@ class Path extends Phaser.Scene {
             //     rotateToPath: true,
             //     rotationOffset: -90
             // }
-
         }
 
     }
