@@ -15,9 +15,6 @@ class Path extends Phaser.Scene {
     }
 
     create() {
-        // Create a follower object, which will be used with a Tween
-        this.follower = { t: 0, vec: new Phaser.Math.Vector2() };
-
         // Create a curve, for use with the path
         // Initial set of points are only used to ensure there is something on screen to begin with.
         // No need to save these values.
