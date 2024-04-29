@@ -1,24 +1,27 @@
+// Name: Sandra Sorensen
+// Asssigment: Build a path
+
 class Path extends Phaser.Scene {
     // Class variable definitions -- these are all "undefined" to start
-    graphics;
-    curve;
-    path;
-    runModeFlag;
+    graphics; // Graphics object for drawing lines
+    curve; // The spline curve used for creating paths
+    path; // Not used currently
+    runModeFlag; // Flag to determine if the game is in run mode
 
     constructor() {
         super("pathMaker");
     }
 
     preload() {
-        this.load.setPath("./assets/");                        // Set load path
-        this.load.image("x-mark", "numeralX.png");             // x marks the spot
-        this.load.image("enemyShip", "enemyGreen1.png");       // spaceship that runs along the path
+        // Set the path for loading assets
+        this.load.setPath("./assets/");
+        // Load images for marking points and the enemy ship
+        this.load.image("x-mark", "numeralX.png"); // x marks the spot
+        this.load.image("enemyShip", "enemyGreen1.png"); // spaceship that runs along the path
     }
 
     create() {
-        // Create a curve, for use with the path
-        // Initial set of points are only used to ensure there is something on screen to begin with.
-        // No need to save these values.
+        // Create a curve, initially populated with sample points for display
         this.points = [
             20, 20,
             80, 400,
@@ -26,35 +29,33 @@ class Path extends Phaser.Scene {
         ];
         this.curve = new Phaser.Curves.Spline(this.points);
 
-        // Initialize Phaser graphics, used to draw lines
+        // Initialize Phaser graphics for drawing
         this.graphics = this.add.graphics();
 
-        // Define key bindings
+        // Define key bindings for user interaction
         this.ESCKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
         this.oKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.O);
         this.rKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
         // Draw initial graphics
         this.xImages = [];
-        this.drawPoints();
-        this.drawLine();
+        this.drawPoints(); // Draw x marks at each point
+        this.drawLine(); // Draw the spline line
 
-        // Create mouse event handler
-        // We create this in create() since we only want one active in this scene
+        // Create mouse event handler for adding points with clicks
         this.mouseDown = this.input.on('pointerdown', (pointer) => {
             this.addPoint({ x: pointer.x, y: pointer.y });
             this.drawLine();
         });
 
-        // TODO:
-        //  - set the run mode flag to false (after implenting run mode)
+        // Set the run mode flag to false initially
         this.runModeFlag = false;
 
-        // Create enemyShip as a follower type of sprite
-        // Call startFollow() on enemyShip to have it follow the curve
+        // Create enemyShip sprite as a follower of the curve
         my.sprite.enemyShip = this.add.follower(this.curve, 10, 10, "enemyShip");
         my.sprite.enemyShip.visible = false;
 
+        // Update the description in the HTML document
         document.getElementById('description').innerHTML = '<h2>Path.js</h2><br>ESC: Clear points <br>O - output points <br>R - run mode';
     }
 
@@ -83,108 +84,71 @@ class Path extends Phaser.Scene {
 
     // Draws the spline
     drawLine() {
-        this.graphics.clear();                      // Clear the existing line
-        this.graphics.lineStyle(2, 0xffffff, 1);    // A white line
-        this.curve.draw(this.graphics, 32);         // Draw the spline
+        this.graphics.clear(); // Clear the existing line
+        this.graphics.lineStyle(2, 0xffffff, 1); // Set line style to a white line
+        this.curve.draw(this.graphics, 32); // Draw the spline with a thickness of 32
     }
 
     update() {
+        // Handle keyboard input
 
+        // Check if the ESC key is pressed
         if (Phaser.Input.Keyboard.JustDown(this.ESCKey)) {
             console.log("Clear path");
-            // TODO: 
-            // * Add code to check if run mode is active
-            //   If run mode is active, then don't call clearPoints()
-            //   (i.e., can only clear points when not in run mode)
-            if (this.runModeFlag) {
 
+            // Check if run mode is active
+            if (this.runModeFlag) {
+                // Do nothing if run mode is active
             }
             else {
+                // Clear the points if not in run mode
                 this.clearPoints();
             }
         }
 
+        // Check if the O key is pressed
         if (Phaser.Input.Keyboard.JustDown(this.oKey)) {
             console.log("Output the points");
 
-            // TODO:
-            // * Print out the points comprising the line
-            //   use a "for ... of" loop to iterate through the
-            //   elements of this.curve.points 
-            //
-            // Format them in the form of an array, so you can copy/paste into
-            // your gallery shooter game:
-            // [
-            //  point0.x, point0.y,
-            //  point1.x, point1.y
-            // ]
-
+            // Output the points comprising the spline
             for (let point of this.curve.points) {
-                console.log([point.x, point.y]);
+                console.log("Points: ", [point.x, point.y]);
             }
         }
 
+        // Check if the R key is pressed
         if (Phaser.Input.Keyboard.JustDown(this.rKey)) {
-
+            // Toggle run mode
             this.runModeFlag = !this.runModeFlag;
 
-            if(this.runModeFlag)
-            {
+            // If run mode is active
+            if (this.runModeFlag) {
                 console.log("Run mode");
-                my.sprite.enemyShip.visible = true;
-                my.sprite.enemyShip.x = this.curve.points[0].x;
-                my.sprite.enemyShip.y = this.curve.points[0].y;
-                my.sprite.enemyShip.startFollow({
-                    from: 0,
-                    to: 1,
-                    delay: 0,
-                    duration: 2000,
-                    ease: 'Sine.easeInOut',
-                    repeat: -1,
-                    yoyo: true,
-                    rotateToPath: true,
-                    rotationOffset: -90
-                });
+                // Check if there are points on the curve
+                if (this.curve.points[0] != null) {
+                    // Set enemyShip properties and make it visible
+                    my.sprite.enemyShip.visible = true;
+                    my.sprite.enemyShip.x = this.curve.points[0].x;
+                    my.sprite.enemyShip.y = this.curve.points[0].y;
+                    // Start following the curve with specified configuration
+                    my.sprite.enemyShip.startFollow({
+                        from: 0,
+                        to: 1,
+                        delay: 0,
+                        duration: 2000,
+                        ease: 'Sine.easeInOut',
+                        repeat: -1,
+                        yoyo: true,
+                        rotateToPath: true,
+                        rotationOffset: -90
+                    });
+                }
             }
-            else if (!this.runModeFlag)
-            {
+            else { // If run mode is not active
+                // Stop following the curve and hide the enemyShip sprite
                 my.sprite.enemyShip.stopFollow();
                 my.sprite.enemyShip.visible = false;
             }
-
-            
-
-            // TODO: 
-            // Implement run mode
-            // Check for runMode active
-            //   If active:
-            //   - call stopFollow on the enemyShip to halt following behavior
-            //   - make the enemyShip sprite invisible
-            //   - set sprite mode to false
-            //  If not active:
-            //   - set sprite mode to true
-            //   - set the location of enemyship to the first point on the curve
-            //     (get this from the zero'th element of this.curve.points array,
-            //      e.g., this.curve.points[0].x)
-            //     (sprites like enemyShip have .x and .y properties)
-            //     Be careful! What happens if this.curve.points is empty?? Perhaps
-            //     you should check for this condition...
-            //   - make the enemyShip sprite visible
-            //   - call startFollow on enemyShip with the following configuration
-            //     object:
-            // {
-            //     from: 0,
-            //     to: 1,
-            //     delay: 0,
-            //     duration: 2000,
-            //     ease: 'Sine.easeInOut',
-            //     repeat: -1,
-            //     yoyo: true,
-            //     rotateToPath: true,
-            //     rotationOffset: -90
-            // }
-
         }
     }
-
 }
